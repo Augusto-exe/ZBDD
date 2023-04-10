@@ -1,24 +1,35 @@
 class Node:
-    def __init__(self, top, po, p1):
+    def __init__(self, top, p0, p1):
         self.top = top
-        self.po = po
+        self.p0 = p0
         self.p1 = p1
+    def printNode(self, node_num):
+        print("[",node_num,"]", "var: ", self.top, " p0: ",self.p0, " p1: ",   self.p1)
 
 
 class ZBDD:
     def __init__(self):
         self.uniq_table = []
         self.base_node = Node(-1, 0, 0)
+        self.base_node_1 = Node(-1, 1, 1)
         self.uniq_table.append(self.base_node)
+        self.uniq_table.append(self.base_node_1)
 
+    def nodeInTable(self,P):
+
+        for node in self.uniq_table:
+            if node.top == P.top and node.p0 == P.p0 and node.p1 == P.p1:
+                return self.uniq_table.index(node)
+        return -1
 
     def getNode(self, top, p0, p1):
         if p1 == self.base_node:
             return p0
         P = Node(top,p0,p1)
-        if P in self.uniq_table:
-            return self.uniq_table.index(P)
-        self.base_node.append(P)
+        n = self.nodeInTable(P)
+        if n > 0:
+            return n
+        self.uniq_table.append(P)
         return self.uniq_table.index(P)
     
     def subset1(self, P, var):
@@ -44,7 +55,7 @@ class ZBDD:
         if node.top < var:
             return self.getNode(var,0,P)
         if node.top == var:
-            return self.getNode(var,node.p1,node.p2)
+            return self.getNode(var,node.p1,node.p0)
         if node.top > var:
             return self.getNode(node.top,self.change(node.p0,var),self.change(node.p1,var))
 
@@ -60,7 +71,7 @@ class ZBDD:
         if nodeP.top > nodeQ.top:
             return self.getNode(nodeP.top,self.union(nodeP.p0,Q),nodeP.p1)
         if nodeQ.top > nodeP.top:
-            return self.getNode(nodeQ.top,self.union(nodeP,nodeQ.p0),nodeQ.p1)
+            return self.getNode(nodeQ.top,self.union(P,nodeQ.p0),nodeQ.p1)
         if nodeP.top == nodeQ.top:
             return self.getNode(nodeP.top,self.union(nodeP.p0,nodeQ.p0),self.union(nodeP.p1,nodeQ.p1))
         
@@ -102,3 +113,5 @@ class ZBDD:
         node = self.uniq_table[P]
         if node.p0 == 0 and node.p1 ==0:
             return 1
+
+
