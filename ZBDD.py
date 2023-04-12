@@ -23,7 +23,7 @@ class ZBDD:
         return -1
 
     def getNode(self, top, p0, p1):
-        if p1 == self.base_node:
+        if p1 == 0:
             return p0
         P = Node(top,p0,p1)
         n = self.nodeInTable(P)
@@ -113,5 +113,4 @@ class ZBDD:
         node = self.uniq_table[P]
         if node.p0 == 0 and node.p1 ==0:
             return 1
-
 
